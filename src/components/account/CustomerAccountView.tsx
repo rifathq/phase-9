@@ -1071,6 +1071,12 @@ export function CustomerAccountView() {
                   </div>
                 </div>
 
+                {/*
+                  TEMPORARILY DISABLED: Google account linking is disabled in the UI because Firebase returns
+                  auth/unauthorized-domain inside the Google AI Studio Preview environment.
+                  All underlying Firebase GoogleAuthProvider and linkGoogleAccount handler code remains intact
+                  and can be re-enabled once the preview domain is authorized in Firebase Console.
+                */}
                 {authProvider === 'google' || user?.providerData.some(p => p.providerId === 'google.com') ? (
                   <button
                     disabled
@@ -1078,7 +1084,7 @@ export function CustomerAccountView() {
                   >
                     Active Method
                   </button>
-                ) : (
+                ) : false ? (
                   <button
                     onClick={async () => {
                       setSecurityLoading('google');
@@ -1096,6 +1102,10 @@ export function CustomerAccountView() {
                   >
                     {securityLoading === 'google' ? 'Connecting...' : 'Connect Google'}
                   </button>
+                ) : (
+                  <span className="text-[11px] text-neutral-400 font-medium italic">
+                    Google sign-in temporarily disabled in preview
+                  </span>
                 )}
               </div>
 

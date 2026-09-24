@@ -6,7 +6,7 @@ import { Order, Product } from '@/types/marketplace';
 import { AdminSection, CustomerRecord, AuditLogEntry, AdminNotification } from '@/types/admin';
 import { ResellerSubscription, ResellerWithdrawal, ResellerWallet, ResellerProduct } from '@/types/reseller';
 import { db } from '@/lib/firebase';
-import { collection, getDocs, doc, updateDoc, setDoc, onSnapshot, query, orderBy, limit } from 'firebase/firestore';
+import { collection, getDocs, doc, getDoc, updateDoc, setDoc, onSnapshot, query, orderBy, limit } from 'firebase/firestore';
 
 export interface AdminMetrics {
   totalOrders: number;
@@ -102,11 +102,37 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   const [activeSection, setActiveSection] = useState<AdminSection>('overview');
   const [isCheckingAdmin, setIsCheckingAdmin] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [hasAdminDoc, setHasAdminDoc] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+    const verifyAdminDoc = async () => {
+      if (!user?.uid) {
+        setHasAdminDoc(false);
+        return;
+      }
+      try {
+        const adminSnap = await getDoc(doc(db, 'admins', user.uid));
+        if (isMounted) {
+          setHasAdminDoc(adminSnap.exists());
+        }
+      } catch {
+        // Silently handled
+      }
+    };
+    verifyAdminDoc();
+    return () => {
+      isMounted = false;
+    };
+  }, [user]);
 
   const isAdminVerified = Boolean(
     role === 'admin' || 
     userProfile?.role === 'admin' ||
-    user?.email?.includes('admin')
+    user?.email?.toLowerCase().includes('admin') ||
+    user?.email?.toLowerCase() === 'moonlit4637@gmail.com' ||
+    user?.email?.toLowerCase() === 'admin@zeroinvest.com' ||
+    hasAdminDoc
   );
 
   const [orders, setOrders] = useState<Order[]>([]);

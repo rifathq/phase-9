@@ -67,7 +67,11 @@ export function PhoneAuthView() {
       setResendTimer(60);
       showToast('OTP sent!', `Verification code dispatched to ${fullPhone}`, 'info');
     } catch (err: any) {
-      setErrorMessage(err.message || 'Unable to send verification SMS. Please check your number.');
+      let msg = err.message || 'Unable to send verification SMS. Please check your number.';
+      if (msg.includes('unauthorized-domain')) {
+        msg = 'Phone SMS verification is restricted on preview domains. Please sign in using your Email & Password.';
+      }
+      setErrorMessage(msg);
     } finally {
       setIsLoading(false);
     }

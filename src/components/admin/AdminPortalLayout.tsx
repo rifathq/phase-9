@@ -123,8 +123,17 @@ export function AdminPortalLayout() {
 
           <div className="pt-2 flex flex-col gap-2">
             <button
-              onClick={() => navigate('home')}
+              onClick={async () => {
+                if (user) await logout();
+                navigate('auth', { authTab: 'signin', returnUrl: 'admin-dashboard' });
+              }}
               className="w-full py-2.5 px-4 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-semibold transition-colors cursor-pointer"
+            >
+              Sign In with Admin Account
+            </button>
+            <button
+              onClick={() => navigate('home')}
+              className="w-full py-2.5 px-4 rounded-xl border border-[#E6E4E0] hover:bg-[#FAF9F5] text-neutral-700 text-xs font-semibold transition-colors cursor-pointer"
             >
               Return to Marketplace Home
             </button>
